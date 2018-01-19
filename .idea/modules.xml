@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SensorCompanion.iml" filepath="$PROJECT_DIR$/SensorCompanion.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opencsv-4.1/opencsv-4.1.iml" filepath="$PROJECT_DIR$/opencsv-4.1/opencsv-4.1.iml" />
     </modules>
   </component>
 </project>
