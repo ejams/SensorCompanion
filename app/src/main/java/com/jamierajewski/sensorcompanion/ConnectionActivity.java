@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.opencsv.CSVWriter;
+
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -32,17 +34,30 @@ public class ConnectionActivity extends AppCompatActivity {
     // writes it to the file in CSV format
     public void writeDataCSV (View view){
         try {
-            CSVWriter writer = new CSVWriter(new FileWriter(FILENAME, true));
+            // Create directory if it doesn't exist
+            File file = new File(getExternalFilesDir(null),"Measurements");
+            if(!file.exists()){
+                Toast.makeText(this, "Creating dir", Toast.LENGTH_SHORT).show();
+                file.mkdir();
+            }
+
+            //
+            File data = new File(file, FILENAME);
+            CSVWriter writer = new CSVWriter(new FileWriter(data, true));
+
             // Get the data from the field when the button is pressed; split it by comma
             TextView textView = findViewById(R.id.csvTextbox);
             String[] record = textView.getText().toString().split(",");
 
             // Write record, close file
             writer.writeNext(record);
+            writer.flush();
             writer.close();
+            Toast.makeText(this, "Write successful", Toast.LENGTH_SHORT).show();
         }
         catch (IOException exception){
             Toast.makeText(this, "File not found", Toast.LENGTH_LONG).show();
+            exception.printStackTrace();
         }
     }
 }
