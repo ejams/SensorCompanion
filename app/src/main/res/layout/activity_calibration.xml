@@ -16,19 +16,20 @@
         android:text="@string/calibration_text"
         android:textAlignment="center"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/modeDropdown"
+        app:layout_constraintBottom_toTopOf="@+id/modeSpinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
-        android:id="@+id/modeDropdown"
+        android:id="@+id/modeSpinner"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
+        android:hapticFeedbackEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/add_new_mode_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -47,7 +48,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/modeDropdown" />
+        app:layout_constraintTop_toBottomOf="@+id/modeSpinner" />
 
     <Button
         android:id="@+id/next_button"

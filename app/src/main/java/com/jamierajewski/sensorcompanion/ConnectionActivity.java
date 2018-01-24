@@ -16,7 +16,7 @@ import java.util.Date;
 public class ConnectionActivity extends AppCompatActivity {
 
     // ***FOR WRITING CONTINUOUS DATA, OPEN FILE IN THE onCreate AND CLOSE IT WHEN
-    // THE MEASUREMENT IS STOPPED***
+    // THE MEASUREMENT IS STOPPED - OR WHEN THE APP IS IN THE BACKGROUND (REOPEN WHEN ITS BACK)***
 
     private String FILENAME;
 
