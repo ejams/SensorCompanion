@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jamierajewski.sensorcompanion">
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,12 +25,18 @@
         </activity>
         <activity
             android:name=".CalibrationActivity"
-            android:parentActivityName=".MainActivity">
-        </activity>
+            android:label="Calibration"
+            android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".ConnectionActivity"
-            android:parentActivityName=".CalibrationActivity">
-        </activity>
+            android:name=".TEST_CSV"
+            android:label="Establish Connection"
+            android:parentActivityName=".CalibrationActivity" />
+        <activity android:name=".AddModeActivity"
+            android:label="Add New Mode"
+            android:parentActivityName=".CalibrationActivity" />
+        <activity android:name=".EditModeActivity"
+            android:label="Edit Mode"
+            android:parentActivityName=".CalibrationActivity" />
     </application>
 
 </manifest>

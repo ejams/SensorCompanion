@@ -8,4 +8,5 @@
     <string name="calibration_text">Please select a mode, or define a new one:</string>
     <string name="add_mode">Add new mode</string>
     <string name="next">Next</string>
+    <string name="edit_mode">Edit mode</string>
 </resources>

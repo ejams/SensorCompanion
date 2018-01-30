@@ -28,7 +28,17 @@ public class CalibrationActivity extends AppCompatActivity {
     }
 
     public void newConnection(View view){
-        Intent intent = new Intent(this, ConnectionActivity.class);
+        Intent intent = new Intent(this, TEST_CSV.class);
+        startActivity(intent);
+    }
+
+    public void addMode(View view) {
+        Intent intent = new Intent(this, AddModeActivity.class);
+        startActivity(intent);
+    }
+
+    public void editMode(View view) {
+        Intent intent = new Intent(this, EditModeActivity.class);
         startActivity(intent);
     }
 }
