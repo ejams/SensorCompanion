@@ -2,9 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.jamierajewski.sensorcompanion"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"

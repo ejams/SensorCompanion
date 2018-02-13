@@ -31,12 +31,11 @@
             android:name=".TEST_CSV"
             android:label="Establish Connection"
             android:parentActivityName=".CalibrationActivity" />
-        <activity android:name=".AddModeActivity"
+        <activity
+            android:name=".AddModeActivity"
             android:label="Add New Mode"
             android:parentActivityName=".CalibrationActivity" />
-        <activity android:name=".EditModeActivity"
-            android:label="Edit Mode"
-            android:parentActivityName=".CalibrationActivity" />
+        <activity android:name=".EditModeActivity"></activity>
     </application>
 
 </manifest>
