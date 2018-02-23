@@ -6,4 +6,73 @@
     android:layout_height="match_parent"
     tools:context="com.jamierajewski.sensorcompanion.AddModeActivity">
 
+    <TextView
+        android:id="@+id/formulaTextview"
+        android:layout_width="288dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Enter the conversion formula from volts:"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/formulaTextbox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/modeNameTextbox" />
+
+    <TextView
+        android:id="@+id/modeNameTextview"
+        android:layout_width="287dp"
+        android:layout_height="62dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Enter the name of the mode (ex. Voltage):"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/modeNameTextbox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/modeNameTextbox"
+        android:layout_width="342dp"
+        android:layout_height="53dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:hint="Name"
+        android:inputType="textPersonName"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/formulaTextview"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/modeNameTextview" />
+
+    <Button
+        android:id="@+id/submitModeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:onClick="submitMode"
+        android:text="Submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/formulaTextbox" />
+
+    <EditText
+        android:id="@+id/formulaTextbox"
+        android:layout_width="339dp"
+        android:layout_height="46dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:ems="10"
+        android:hint="Formula"
+        android:inputType="text|textEmailAddress"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/submitModeButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/formulaTextview" />
+
 </android.support.constraint.ConstraintLayout>
