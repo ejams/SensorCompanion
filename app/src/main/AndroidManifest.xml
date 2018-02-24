@@ -35,13 +35,17 @@
             android:name=".AddModeActivity"
             android:label="Add New Mode"
             android:parentActivityName=".CalibrationActivity" />
-        <activity android:name=".EditModeActivity" />
-        <activity android:name=".DeviceList"
+        <activity
+            android:name=".DeviceList"
             android:label="Connect to a Device"
-            android:parentActivityName=".MainActivity"/>
-        <activity android:name=".ReceiveData"
-            android:parentActivityName=".DeviceList"
-            android:label="Should be connected"></activity>
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ReceiveData"
+            android:label="Should be connected"
+            android:parentActivityName=".DeviceList" />
+        <activity android:name=".EditMode"
+            android:label="Edit Mode"
+            android:parentActivityName=".CalibrationActivity" />
     </application>
 
 </manifest>

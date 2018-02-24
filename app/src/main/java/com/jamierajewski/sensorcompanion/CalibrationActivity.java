@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -31,6 +32,12 @@ public class CalibrationActivity extends AppCompatActivity {
     public void populateSpinner(){
         // Create and/or open file containing different modes
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
+        // Check if voltage exists; if not, add it in as a default
+        if (!prefs.contains("Voltage")){
+            SharedPreferences.Editor editor = getSharedPreferences("modeFile", MODE_PRIVATE).edit();
+            editor.putString("Voltage", "y=x");
+            editor.apply();
+        }
         // Get all entries so that we can pull just the keys out to populate the spinner
         ArrayList<String> tempList = new ArrayList<>();
         Map<String, ?> allEntries = prefs.getAll();
@@ -69,10 +76,17 @@ public class CalibrationActivity extends AppCompatActivity {
     public void editMode(View view) {
         // Get the currently selected item and pass it with the intent
         Spinner spinner = findViewById(R.id.modeSpinner);
+        // Since Voltage cannot be removed, it'll always be selected in the case of no selection
         String mode = spinner.getSelectedItem().toString();
 
-        Intent intent = new Intent(this, EditModeActivity.class);
-        intent.putExtra("item", mode);
-        startActivity(intent);
+        if (mode.matches("Voltage")){
+            Toast.makeText(this, "Cannot edit default Voltage", Toast.LENGTH_LONG).show();
+        }
+
+        else {
+            Intent intent = new Intent(this, EditMode.class);
+            intent.putExtra("item", mode);
+            startActivity(intent);
+        }
     }
 }
