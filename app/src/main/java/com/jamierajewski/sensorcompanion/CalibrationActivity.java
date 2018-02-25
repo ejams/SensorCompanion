@@ -58,7 +58,6 @@ public class CalibrationActivity extends AppCompatActivity {
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
         // Set the default value to position 0
-        /// POSSIBLE CRASH IF THERE ARE NO ELEMENTS IN THE SPINNER? ///
         spinner.setSelection(0,true);
     }
 

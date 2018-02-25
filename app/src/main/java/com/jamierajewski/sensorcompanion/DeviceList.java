@@ -1,5 +1,6 @@
 package com.jamierajewski.sensorcompanion;
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -15,6 +16,13 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Set;
+
+//
+// Bluetooth based on code from:
+// http://www.instructables.com/id/Android-Bluetooth-Control-LED-Part-2/
+// Continuously updating listview based on code from:
+// https://stackoverflow.com/questions/18840896/constantly-update-list-items
+//
 
 public class DeviceList extends AppCompatActivity {
 
@@ -83,7 +91,6 @@ public class DeviceList extends AppCompatActivity {
         final ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, list);
         devicelist.setAdapter(adapter);
         devicelist.setOnItemClickListener(myListClickListener); //Method called when the device from the list is clicked
-
     }
 
     private AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener()
@@ -98,7 +105,7 @@ public class DeviceList extends AppCompatActivity {
             Intent i = new Intent(DeviceList.this, ReceiveData.class);
 
             //Change the activity.
-            i.putExtra(EXTRA_ADDRESS, address); //this will be received at ledControl (class) Activity
+            i.putExtra(EXTRA_ADDRESS, address); //this will be received on the graphing activity
             startActivity(i);
         }
     };

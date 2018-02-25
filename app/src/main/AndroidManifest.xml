@@ -41,7 +41,7 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ReceiveData"
-            android:label="Should be connected"
+            android:label="Receiving Data Demo"
             android:parentActivityName=".DeviceList" />
         <activity android:name=".EditMode"
             android:label="Edit Mode"
