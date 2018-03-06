@@ -25,6 +25,9 @@ import java.util.UUID;
 // http://www.instructables.com/id/Android-Bluetooth-Control-LED-Part-2/
 //
 
+///---CREATE A SECOND THREAD THAT CAN ALSO ACCESS THE DATA, WHICH WILL STRICTLY WRITE THE DATA
+///---TO A FILE WHILE THE OTHER PRINTS DATA TO SCREEN (OR PLOTS IT IN THE FUTURE)
+
 public class ReceiveData extends AppCompatActivity {
 
     ScrollView dataScrollview;

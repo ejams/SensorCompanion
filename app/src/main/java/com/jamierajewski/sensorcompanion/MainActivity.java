@@ -19,4 +19,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CalibrationActivity.class);
         startActivity(intent);
     }
+
+    public void graphExample(View view){
+        Intent intent = new Intent(this, graph_example.class);
+        startActivity(intent);
+    }
 }

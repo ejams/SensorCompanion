@@ -26,6 +26,7 @@
         <activity
             android:name=".CalibrationActivity"
             android:label="Calibration"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".TEST_CSV"
@@ -33,19 +34,25 @@
             android:parentActivityName=".CalibrationActivity" />
         <activity
             android:name=".AddModeActivity"
+            android:screenOrientation="portrait"
             android:label="Add New Mode"
             android:parentActivityName=".CalibrationActivity" />
         <activity
             android:name=".DeviceList"
+            android:screenOrientation="portrait"
             android:label="Connect to a Device"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ReceiveData"
             android:label="Receiving Data Demo"
             android:parentActivityName=".DeviceList" />
-        <activity android:name=".EditMode"
+        <activity
+            android:name=".EditMode"
+            android:screenOrientation="portrait"
             android:label="Edit Mode"
             android:parentActivityName=".CalibrationActivity" />
+        <activity
+            android:name=".graph_example" />
     </application>
 
 </manifest>
