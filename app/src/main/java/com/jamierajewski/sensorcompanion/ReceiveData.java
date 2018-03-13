@@ -54,9 +54,6 @@ public class ReceiveData extends AppCompatActivity {
         Intent newint = getIntent();
         address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS); //receive the address of the bluetooth device
 
-        //view of the Receive Data activity
-        setContentView(R.layout.activity_receive_data);
-
         //call the widgets
         btnDis = findViewById(R.id.btn_disconnect);
         dataScrollview = findViewById(R.id.receivedDataScrollview);

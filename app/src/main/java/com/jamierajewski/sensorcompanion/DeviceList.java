@@ -102,7 +102,7 @@ public class DeviceList extends AppCompatActivity {
             String address = info.substring(info.length() - 17);
 
             // Make an intent to start next activity.
-            Intent i = new Intent(DeviceList.this, ReceiveData.class);
+            Intent i = new Intent(DeviceList.this, graph_example.class);
 
             //Change the activity.
             i.putExtra(EXTRA_ADDRESS, address); //this will be received on the graphing activity
