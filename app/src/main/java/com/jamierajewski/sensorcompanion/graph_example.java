@@ -23,17 +23,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import static java.lang.Float.parseFloat;
 
 
 public class graph_example extends AppCompatActivity {
 
     private final Handler mHandler = new Handler();
     private LineGraphSeries<DataPoint> mSeries;
-    float currentTime = 0;
 
     private static final String TAG = "graph_example";
+
+    // TEST //
+    float count = 0;
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
@@ -58,7 +63,6 @@ public class graph_example extends AppCompatActivity {
         disconnect_btn = findViewById(R.id.disconnect_button);
 
         new ConnectBT().execute(); //Call the class to connect
-        //currentTime = System.currentTimeMillis();
 
         //commands to be sent to bluetooth
         disconnect_btn.setOnClickListener(new View.OnClickListener()
@@ -99,34 +103,6 @@ public class graph_example extends AppCompatActivity {
 
     //////////////// ***BLUETOOTH-RELATED*** /////////////////
 
-    // Receive the serial data and convert it to a float
-    public void receiveData(BluetoothSocket socket) throws IOException {
-        InputStream socketInputStream = socket.getInputStream();
-
-        byte[] buffer = new byte[8];
-        int bytes;
-        bytes = socketInputStream.read(buffer);
-        // Convert bytes back to float
-        //Float value = ByteBuffer.wrap(buffer).getFloat();
-        String orig = new String(buffer, 0, bytes);
-        //Float value = Float.parseFloat(orig);
-
-        Log.i(TAG, "orig - " + orig);
-
-        // Send signal that process is done and next signal can be received
-        //socketOutputStream.write(1);
-
-        //Log.i(TAG, "VALUE - " + value);
-
-
-        // Append the data point to the graph
-        //// ***maxDataPoints is set to hold the number of values taken in 24 hours, if one value every .25 seconds
-        /// get current time - ***TRY SIMPLY SETTING IT TO THE REFRESH TIME***
-        //mSeries.appendData(new DataPoint(currentTime, value), true, 22);
-
-        // Write to file in separate thread
-}
-
     // Continually update the list of data
     Runnable mUpdater = new Runnable() {
         @Override
@@ -136,21 +112,70 @@ public class graph_example extends AppCompatActivity {
                 if (!mRunning) return;
 
                 // Receive data and process it
-                try {
-                    receiveData(btSocket);
-                    ///***HARDCODE TIME FOR TESTING - DO NOT USE IN RELEASE***e
-                    currentTime += 0.25;
-                } catch (IOException e) {
-                    Thread t = Thread.currentThread();
-                    t.getUncaughtExceptionHandler().uncaughtException(t, e);
-                }
+//                try {
+                    //receiveData(btSocket);
+                new processData().execute(btSocket);
             }
 
             // Schedule next run
-            //mHandler.postDelayed(this, 250); // <<-- SET TIME TO REFRESH HERE
+            //mHandler.postDelayed(this, 100);
             mHandler.post(this);
         }
     };
+
+    /// CREATE ANOTHER ASYNCTASK TO WRITE TO FILE??? ///
+
+    private class processData extends AsyncTask<BluetoothSocket, Void, String[]>
+    {
+        int offset = 0;
+        int bytesRead = 0;
+        byte[] data = new byte[35];
+
+        @Override
+        protected String[] doInBackground(BluetoothSocket... sockets)
+        {
+            try {
+                InputStream socketInputStream = sockets[0].getInputStream();
+                while ((bytesRead = socketInputStream.read(data, offset, data.length - offset))
+                        != -1) {
+                    offset += bytesRead;
+                    if (offset >= data.length) {
+                        break;
+                    }
+                }
+                String str = new String(data, 0, offset, "UTF-8");
+                String[] ret = str.split("\n");
+                return ret;
+
+            } catch (IOException e){
+                msg("Error opening socket stream");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) //after the doInBackground, it checks if everything went fine
+        {
+            float ret;
+            //super.onPostExecute(result);
+            for (String entry: result){
+                try{
+                    ret = Float.parseFloat(entry);
+
+                } catch (Exception e){
+                    ret = 0;
+                }
+                // Some buggy behaviour can cause large values to appear if the bytes come in a certain order,
+                // so report it as 0
+                if (ret > 5){
+                    ret = 0;
+                }
+                //Log.i(TAG, "Recv'd - " + ret);
+                mSeries.appendData(new DataPoint(count+=0.25, ret), true, 22);
+            }
+        }
+    }
 
     // When the app resumes focus, begin updating again
     @Override
