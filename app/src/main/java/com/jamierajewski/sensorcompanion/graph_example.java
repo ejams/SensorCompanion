@@ -4,11 +4,14 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +27,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimerTask;
 import java.util.UUID;
 
@@ -38,7 +44,7 @@ public class graph_example extends AppCompatActivity {
     private static final String TAG = "graph_example";
 
     // TEST //
-    float count = 0;
+    AsyncTask task;
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
@@ -70,6 +76,9 @@ public class graph_example extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
+                // Stop the processing thread / log to file
+                mRunning = false;
+                task.cancel(true);
                 Disconnect(); //close connection
             }
         });
@@ -89,16 +98,56 @@ public class graph_example extends AppCompatActivity {
         // ***FIND BEST DOMAIN FOR THE VIEWPORT BASED ON THE DATA?***
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(4);
+        graph.getViewport().setMaxX(3);
+
+        //graph.getGridLabelRenderer().setNumHorizontalLabels(9);
+        graph.getGridLabelRenderer().setNumVerticalLabels(6);
 
         // Pad the y-axis labels so they are visible
-        graph.getGridLabelRenderer().setLabelVerticalWidth(100);
+        //graph.getGridLabelRenderer().setPadding(75);
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Voltage (V)");
+        graph.getGridLabelRenderer().setLabelVerticalWidth(50);
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
+        graph.getGridLabelRenderer().setLabelHorizontalHeight(50);
 
         // first mSeries is a line
         mSeries = new LineGraphSeries<>();
-        mSeries.setDrawDataPoints(true);
+        //mSeries.setDrawDataPoints(true);
         mSeries.setDrawBackground(true);
         graph.addSeries(mSeries);
+    }
+
+    @Override
+    public void onBackPressed(){
+        // Create an alert dialog to warn the user about deletion
+        AlertDialog alertDialog = new AlertDialog.Builder(graph_example.this).create();
+        alertDialog.setTitle("WARNING");
+        alertDialog.setMessage("Are you sure you want to delete this entry?");
+        alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Stop the processing thread / log to file
+                        mRunning = false;
+                        task.cancel(true);
+
+                        // Disconnect from the sensor
+                        Disconnect();
+
+                        // Return to previous page
+                        Intent intent = new Intent(graph_example.this, DeviceList.class);
+                        finish();
+                        startActivity(intent);
+                    }
+
+                });
+        alertDialog.setButton(alertDialog.BUTTON_NEGATIVE, "No",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        alertDialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
     //////////////// ***BLUETOOTH-RELATED*** /////////////////
@@ -114,26 +163,30 @@ public class graph_example extends AppCompatActivity {
                 // Receive data and process it
 //                try {
                     //receiveData(btSocket);
-                new processData().execute(btSocket);
+                task = new processData().execute(btSocket);
             }
 
             // Schedule next run
-            //mHandler.postDelayed(this, 100);
-            mHandler.post(this);
+            mHandler.postDelayed(this, 200);
+            //mHandler.post(this);
         }
     };
 
     /// CREATE ANOTHER ASYNCTASK TO WRITE TO FILE??? ///
 
-    private class processData extends AsyncTask<BluetoothSocket, Void, String[]>
+    private class processData extends AsyncTask<BluetoothSocket, ArrayList, ArrayList<ArrayList>>
     {
         int offset = 0;
         int bytesRead = 0;
         byte[] data = new byte[35];
 
         @Override
-        protected String[] doInBackground(BluetoothSocket... sockets)
+        protected ArrayList<ArrayList> doInBackground(BluetoothSocket... sockets)
         {
+            float voltage;
+            float time;
+            String[] ret;
+
             try {
                 InputStream socketInputStream = sockets[0].getInputStream();
                 while ((bytesRead = socketInputStream.read(data, offset, data.length - offset))
@@ -144,36 +197,62 @@ public class graph_example extends AppCompatActivity {
                     }
                 }
                 String str = new String(data, 0, offset, "UTF-8");
-                String[] ret = str.split("\n");
-                return ret;
+                ret = str.split("\n");
+
+                //return ret;
 
             } catch (IOException e){
+                // If the socket cant be opened, return null
                 msg("Error opening socket stream");
+                return null;
             }
 
-            return null;
+            //super.onPostExecute(result);
+            float lastTime = 0;
+            ArrayList<ArrayList> pairList = new ArrayList<>();
+
+            for (String entry: ret) {
+                try {
+                    String[] parts = entry.split("-");
+
+                    voltage = Float.parseFloat(parts[0]);
+                    time = Float.parseFloat(parts[1]);
+
+                } catch (Exception e) {
+                    continue;
+                }
+
+                // Ensure data is valid, then store in a float pair
+                if (voltage > 0.00 && voltage <= 5.00 && time > lastTime) {
+                    lastTime = time;
+                    ArrayList<Float> pair = new ArrayList<>();
+                    pair.add(time);
+                    pair.add(voltage);
+
+                    // Now store that pair in the list to be returned
+                    pairList.add(pair);
+                } else {
+                    continue;
+                }
+            }
+
+            return pairList;
         }
 
         @Override
-        protected void onPostExecute(String[] result) //after the doInBackground, it checks if everything went fine
+        protected void onPostExecute(ArrayList<ArrayList> result) //after the doInBackground, it checks if everything went fine
         {
-            float ret;
-            //super.onPostExecute(result);
-            for (String entry: result){
-                try{
-                    ret = Float.parseFloat(entry);
+            float time;
+            float voltage;
 
-                } catch (Exception e){
-                    ret = 0;
-                }
-                // Some buggy behaviour can cause large values to appear if the bytes come in a certain order,
-                // so report it as 0
-                if (ret > 5){
-                    ret = 0;
-                }
-                //Log.i(TAG, "Recv'd - " + ret);
-                mSeries.appendData(new DataPoint(count+=0.25, ret), true, 22);
+            for (ArrayList<Float> pair : result){
+                time = pair.get(0);
+                voltage = pair.get(1);
+                //Log.i(TAG, "Recv'd: " + voltage + " " + time);
+                mSeries.appendData(new DataPoint(time, voltage), true, 30);
             }
+            result.clear();
+            //mSeries.appendData(new DataPoint(count+=0.10, voltage), true, 10);
         }
     }
 
@@ -234,8 +313,8 @@ public class graph_example extends AppCompatActivity {
                 if (btSocket == null || !isBtConnected)
                 {
                     myBluetooth = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
-                    BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
-                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+                    BluetoothDevice temp = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
+                    btSocket = temp.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
                     BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     btSocket.connect();//start connection
                 }
