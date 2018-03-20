@@ -110,6 +110,10 @@ public class graph_example extends AppCompatActivity {
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
         graph.getGridLabelRenderer().setLabelHorizontalHeight(50);
 
+        // enable scaling and scrolling
+        graph.getViewport().setScalable(true);
+        //graph.getViewport().setScalableY(true);
+
         // first mSeries is a line
         mSeries = new LineGraphSeries<>();
         //mSeries.setDrawDataPoints(true);
