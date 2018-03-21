@@ -21,10 +21,12 @@ import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.udojava.evalex.Expression;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +45,11 @@ public class graph_example extends AppCompatActivity {
 
     private static final String TAG = "graph_example";
 
-    // TEST //
+    // Tasks //
     AsyncTask task;
+
+    // Formula
+    String formula = null;
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
@@ -64,7 +69,10 @@ public class graph_example extends AppCompatActivity {
 
         // BT
         Intent newint = getIntent();
-        address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS); //receive the address of the bluetooth device
+        //receive the address of the bluetooth device
+        address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS);
+        //receive the formula for converting
+        formula = newint.getStringExtra(DeviceList.FORMULA);
 
         disconnect_btn = findViewById(R.id.disconnect_button);
 
@@ -90,20 +98,20 @@ public class graph_example extends AppCompatActivity {
     }
 
     public void initGraph(GraphView graph) {
-        // ***ALLOW USER TO SPECIFY THEIR OWN RANGE?***
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(5);
+        // ***ALLOW USER TO SPECIFY THEIR OWN RANGE?*** <<--- YES
+        //graph.getViewport().setYAxisBoundsManual(true);
+        //graph.getViewport().setMinY(0);
+        //graph.getViewport().setMaxY(5);
 
-        // ***FIND BEST DOMAIN FOR THE VIEWPORT BASED ON THE DATA?***
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(3);
 
-        //graph.getGridLabelRenderer().setNumHorizontalLabels(9);
         graph.getGridLabelRenderer().setNumVerticalLabels(6);
 
         // Pad the y-axis labels so they are visible
+
+        // **RATHER THAN USE GRAPHVIEW LABELS, CREATE MY OWN SINCE THEY'RE STATIC**
         //graph.getGridLabelRenderer().setPadding(75);
         graph.getGridLabelRenderer().setVerticalAxisTitle("Voltage (V)");
         graph.getGridLabelRenderer().setLabelVerticalWidth(50);
@@ -112,7 +120,6 @@ public class graph_example extends AppCompatActivity {
 
         // enable scaling and scrolling
         graph.getViewport().setScalable(true);
-        //graph.getViewport().setScalableY(true);
 
         // first mSeries is a line
         mSeries = new LineGraphSeries<>();
@@ -163,21 +170,17 @@ public class graph_example extends AppCompatActivity {
             if (isBtConnected) {
                 // Check if still in focus
                 if (!mRunning) return;
-
-                // Receive data and process it
-//                try {
-                    //receiveData(btSocket);
                 task = new processData().execute(btSocket);
             }
 
             // Schedule next run
             mHandler.postDelayed(this, 200);
-            //mHandler.post(this);
         }
     };
 
-    /// CREATE ANOTHER ASYNCTASK TO WRITE TO FILE??? ///
+    /// CREATE ANOTHER ASYNCTASK TO WRITE TO FILE??? /// <<--- YES, CALL IT INSIDE processData
 
+    // **SPLIT THIS INTO SMALLER FUNCTIONS THAT GET CALLED INSIDE THE ASYNCTASK**
     private class processData extends AsyncTask<BluetoothSocket, ArrayList, ArrayList<ArrayList>>
     {
         int offset = 0;
@@ -187,6 +190,7 @@ public class graph_example extends AppCompatActivity {
         @Override
         protected ArrayList<ArrayList> doInBackground(BluetoothSocket... sockets)
         {
+            BigDecimal temp;
             float voltage;
             float time;
             String[] ret;
@@ -203,15 +207,12 @@ public class graph_example extends AppCompatActivity {
                 String str = new String(data, 0, offset, "UTF-8");
                 ret = str.split("\n");
 
-                //return ret;
-
             } catch (IOException e){
                 // If the socket cant be opened, return null
                 msg("Error opening socket stream");
                 return null;
             }
 
-            //super.onPostExecute(result);
             float lastTime = 0;
             ArrayList<ArrayList> pairList = new ArrayList<>();
 
@@ -219,7 +220,11 @@ public class graph_example extends AppCompatActivity {
                 try {
                     String[] parts = entry.split("-");
 
-                    voltage = Float.parseFloat(parts[0]);
+                    //voltage = Float.parseFloat(parts[0]);
+                    Expression expression = new Expression(formula).with("x", parts[0]);
+                    temp = expression.eval();
+                    voltage = temp.floatValue();
+
                     time = Float.parseFloat(parts[1]);
 
                 } catch (Exception e) {
@@ -227,7 +232,9 @@ public class graph_example extends AppCompatActivity {
                 }
 
                 // Ensure data is valid, then store in a float pair
-                if (voltage > 0.00 && voltage <= 5.00 && time > lastTime) {
+                //***RATHER THAN 0-5, CHECK IF IT'S BETWEEN THE RANGE SET BY THE USER***
+                //if (voltage > 0.00 && voltage <= 5.00 && time > lastTime) {
+                if (time > lastTime) {
                     lastTime = time;
                     ArrayList<Float> pair = new ArrayList<>();
                     pair.add(time);
@@ -243,8 +250,9 @@ public class graph_example extends AppCompatActivity {
             return pairList;
         }
 
+        // After processing, append each new point to the graph
         @Override
-        protected void onPostExecute(ArrayList<ArrayList> result) //after the doInBackground, it checks if everything went fine
+        protected void onPostExecute(ArrayList<ArrayList> result)
         {
             float time;
             float voltage;
@@ -255,8 +263,8 @@ public class graph_example extends AppCompatActivity {
                 //Log.i(TAG, "Recv'd: " + voltage + " " + time);
                 mSeries.appendData(new DataPoint(time, voltage), true, 30);
             }
+            // Attempt to help the garbage collector; not sure if it matters
             result.clear();
-            //mSeries.appendData(new DataPoint(count+=0.10, voltage), true, 10);
         }
     }
 
@@ -299,7 +307,7 @@ public class graph_example extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
 
-    private class ConnectBT extends AsyncTask<Void, Void, Void>  // UI thread
+    private class ConnectBT extends AsyncTask<Void, Void, Void>
     {
         private boolean ConnectSuccess = true; //if it's here, it's almost connected
 
@@ -348,29 +356,3 @@ public class graph_example extends AppCompatActivity {
         }
     }
 }
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        mTimer = new Runnable() {
-//            @Override
-//            public void run() {
-//                graphLastXValue += 0.25d;
-//                mSeries.appendData(new DataPoint(graphLastXValue, getRandom()), true, 22);
-//                mHandler.postDelayed(this, 330);
-//            }
-//        };
-//        mHandler.postDelayed(mTimer, 1500);
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        mHandler.removeCallbacks(mTimer);
-//    }
-//
-//    double mLastRandom = 2;
-//    Random mRand = new Random();
-//    private double getRandom() {
-//        return mLastRandom += mRand.nextDouble()*0.5 - 0.25;
-//    }
-//}

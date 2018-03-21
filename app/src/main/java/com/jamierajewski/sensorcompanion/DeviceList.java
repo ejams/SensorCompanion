@@ -34,11 +34,16 @@ public class DeviceList extends AppCompatActivity {
     private BluetoothAdapter myBluetooth = null;
     private Set<BluetoothDevice> pairedDevices;
     public static String EXTRA_ADDRESS = "device_address";
+    public static String FORMULA = "formula";
+    public String mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_list);
+
+        Intent newintent = getIntent();
+        mode = newintent.getStringExtra(CalibrationActivity.MODE);
 
         //Calling widgets
         btnPaired = findViewById(R.id.button);
@@ -105,7 +110,8 @@ public class DeviceList extends AppCompatActivity {
             Intent i = new Intent(DeviceList.this, graph_example.class);
 
             //Change the activity.
-            i.putExtra(EXTRA_ADDRESS, address); //this will be received on the graphing activity
+            i.putExtra(EXTRA_ADDRESS, address);
+            i.putExtra(FORMULA, mode);
             startActivity(i);
         }
     };

@@ -9,10 +9,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.udojava.evalex.Expression;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class CalibrationActivity extends AppCompatActivity {
+
+    public static String MODE = "formula";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +66,36 @@ public class CalibrationActivity extends AppCompatActivity {
         spinner.setSelection(0,true);
     }
 
+    public void testMode(View view){
+        Spinner spinner = findViewById(R.id.modeSpinner);
+        String mode = spinner.getSelectedItem().toString();
+
+        // Get the associated formula with the selection
+        SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
+        String formula_text = prefs.getString(mode, null);
+
+        BigDecimal result;
+
+        formula_text = (formula_text.split("="))[1];
+        Expression expression = new Expression(formula_text).with("x", "2.41");
+        result = expression.eval();
+        Float f = result.floatValue();
+
+        Toast.makeText(this, "Result: " + f, Toast.LENGTH_LONG).show();
+    }
+
     public void connect(View view){
-        /// WHEN MOVING ON WITH A VALID SELECTION, PASS THE FORMULA ///
+        Spinner spinner = findViewById(R.id.modeSpinner);
+        String mode = spinner.getSelectedItem().toString();
+
+        // Get the associated formula with the selection
+        SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
+        String formula_text = prefs.getString(mode, null);
+        // Only take the expression after the '=' to evaluate
+        formula_text = (formula_text.split("="))[1];
+
         Intent intent = new Intent(this, DeviceList.class);
+        intent.putExtra(MODE, formula_text);
         startActivity(intent);
     }
 

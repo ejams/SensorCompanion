@@ -33,4 +33,5 @@ dependencies {
 
     compile 'com.jjoe64:graphview:4.2.1'
     compile 'com.opencsv:opencsv:4.1'
+    compile 'com.udojava:EvalEx:2.0'
 }
