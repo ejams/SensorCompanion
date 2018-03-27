@@ -68,7 +68,7 @@ public class GraphActivity extends AppCompatActivity {
         //receive the formula for converting
         formula = newint.getStringExtra(DeviceListActivity.FORMULA);
 
-        disconnect_btn = findViewById(R.id.disconnect_button);
+        disconnect_btn = findViewById(R.id.finish_button);
 
         new ConnectBT().execute(); //Call the class to connect
 
@@ -145,7 +145,7 @@ public class GraphActivity extends AppCompatActivity {
 
 
     // CITATION - http://alias-i.com/lingpipe/docs/api/com/aliasi/stats/OnlineNormalEstimator.html
-    // Modified for float instead of double
+    // Modified for float instead of double; add std. dev
     // An implementation of Welford's Algorithm, allowing for running mean and standard deviation
     public class Welford_Est{
         long n = 0;
@@ -331,7 +331,7 @@ public class GraphActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute()
         {
-            progress = ProgressDialog.show(GraphActivity.this, "Connecting...", "Please wait!!!");  //show a progress dialog
+            progress = ProgressDialog.show(GraphActivity.this, "Connecting...", "Please wait!");  //show a progress dialog
         }
 
         @Override
@@ -361,7 +361,7 @@ public class GraphActivity extends AppCompatActivity {
 
             if (!ConnectSuccess)
             {
-                msg("Connection Failed. Is it a SPP Bluetooth? Try again.");
+                msg("Connection Failed. Ensure the sensor is transmitting.");
                 finish();
             }
             else

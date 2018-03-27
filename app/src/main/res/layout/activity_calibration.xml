@@ -24,6 +24,7 @@
 
     <Spinner
         android:id="@+id/modeSpinner"
+        android:background="@drawable/back"
         android:layout_width="344dp"
         android:layout_height="37dp"
         android:layout_marginBottom="328dp"

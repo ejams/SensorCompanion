@@ -1,5 +1,6 @@
 package com.jamierajewski.sensorcompanion;
 
+import android.content.BroadcastReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -45,7 +46,7 @@ public class DeviceListActivity extends AppCompatActivity {
         mode = newintent.getStringExtra(CalibrationActivity.MODE);
 
         //Calling widgets
-        btnPaired = findViewById(R.id.button);
+        btnPaired = findViewById(R.id.paired_button);
         devicelist = findViewById(R.id.listView);
 
         //if the device has bluetooth
@@ -71,7 +72,14 @@ public class DeviceListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                pairedDevicesList();
+                if (!myBluetooth.isEnabled()){
+                    //Ask to the user turn the bluetooth on
+                    Intent turnBTon = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(turnBTon,1);
+                }
+                else {
+                    pairedDevicesList();
+                }
             }
         });
     }
