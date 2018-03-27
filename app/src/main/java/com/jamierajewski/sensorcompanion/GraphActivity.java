@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +49,7 @@ public class GraphActivity extends AppCompatActivity {
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
-    Button disconnect_btn;
+    Button finish_button;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -68,12 +70,12 @@ public class GraphActivity extends AppCompatActivity {
         //receive the formula for converting
         formula = newint.getStringExtra(DeviceListActivity.FORMULA);
 
-        disconnect_btn = findViewById(R.id.finish_button);
+        finish_button = findViewById(R.id.finish_button);
 
         new ConnectBT().execute(); //Call the class to connect
 
         //commands to be sent to bluetooth
-        disconnect_btn.setOnClickListener(new View.OnClickListener()
+        finish_button.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -91,9 +93,9 @@ public class GraphActivity extends AppCompatActivity {
 
     public void initGraph(GraphView graph) {
         // ***ALLOW USER TO SPECIFY THEIR OWN RANGE?*** <<--- YES
-        //graph.getViewport().setYAxisBoundsManual(true);
-        //graph.getViewport().setMinY(0);
-        //graph.getViewport().setMaxY(5);
+//        graph.getViewport().setYAxisBoundsManual(true);
+//        graph.getViewport().setMinY(0);
+//        graph.getViewport().setMaxY(5);
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
@@ -142,6 +144,44 @@ public class GraphActivity extends AppCompatActivity {
                 });
         alertDialog.show();
     }
+
+//    public void onStartPressed(View view){
+//
+//        // Create an alert dialog to get the range for the graph
+//        AlertDialog alertDialog = new AlertDialog.Builder(GraphActivity.this).create();
+//        alertDialog.setTitle("Range");
+//        alertDialog.setMessage("Please set the range: ");
+//
+//        final EditText input = new EditText(this);
+//        input.setInputType(InputType.TYPE_CLASS_TEXT);
+//        alertDialog.setView(input);
+//        alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Enter",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        int lower, higher = 0;
+//                        try {
+//                            String[] result = (input.getText().toString()).split(",");
+//                            lower = Integer.getInteger(result[0]);
+//                            higher = Integer.getInteger(result[1]);
+//                        } catch (Exception ex){
+//                            return;
+//                        }
+//                        GraphView graph = findViewById(R.id.graph);
+//                        graph.getViewport().setMinY(lower);
+//                        graph.getViewport().setMaxY(higher);
+//                        graph.draw();
+//                    }
+//
+//                });
+//        alertDialog.setButton(alertDialog.BUTTON_NEGATIVE, "Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        alertDialog.dismiss();
+//                    }
+//                });
+//        alertDialog.show();
+//    }
 
 
     // CITATION - http://alias-i.com/lingpipe/docs/api/com/aliasi/stats/OnlineNormalEstimator.html
