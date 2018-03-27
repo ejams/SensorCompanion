@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
@@ -43,9 +45,13 @@ public class graph_example extends AppCompatActivity {
     private final Handler mHandler = new Handler();
     private LineGraphSeries<DataPoint> mSeries;
 
+    // Stat-related
+    Welford_Est moving_stats = new Welford_Est();
+
+    // Tag for logging purposes
     private static final String TAG = "graph_example";
 
-    // Tasks //
+    // Tasks
     AsyncTask task;
 
     // Formula
@@ -84,10 +90,8 @@ public class graph_example extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                // Stop the processing thread / log to file
-                mRunning = false;
-                task.cancel(true);
-                Disconnect(); //close connection
+                //Disconnect(); //close connection
+                onBackPressed();
             }
         });
 
@@ -133,21 +137,11 @@ public class graph_example extends AppCompatActivity {
         // Create an alert dialog to warn the user about deletion
         AlertDialog alertDialog = new AlertDialog.Builder(graph_example.this).create();
         alertDialog.setTitle("WARNING");
-        alertDialog.setMessage("Are you sure you want to delete this entry?");
+        alertDialog.setMessage("Are you sure you want to quit?");
         alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // Stop the processing thread / log to file
-                        mRunning = false;
-                        task.cancel(true);
-
-                        // Disconnect from the sensor
                         Disconnect();
-
-                        // Return to previous page
-                        Intent intent = new Intent(graph_example.this, DeviceList.class);
-                        finish();
-                        startActivity(intent);
                     }
 
                 });
@@ -160,6 +154,27 @@ public class graph_example extends AppCompatActivity {
                 });
         alertDialog.show();
     }
+
+
+    // CITATION - http://alias-i.com/lingpipe/docs/api/com/aliasi/stats/OnlineNormalEstimator.html
+    // Modified for float instead of double
+    // An implementation of Welford's Algorithm, allowing for running mean and standard deviation
+    public class Welford_Est{
+        long n = 0;
+        float mu = 0;
+        float sq = 0;
+
+        void update(float x) {
+            ++n;
+            float muNew = mu + (x - mu)/n;
+            sq += (x - mu) * (x - muNew);
+            mu = muNew;
+        }
+        float mean() { return mu; }
+        float var() { return n > 1 ? sq/n : 0; }
+        float deviation() {return (float)Math.sqrt(var());}
+    }
+
 
     //////////////// ***BLUETOOTH-RELATED*** /////////////////
 
@@ -256,12 +271,22 @@ public class graph_example extends AppCompatActivity {
         {
             float time;
             float voltage;
+            TextView mean_view = findViewById(R.id.result_mean_textview);
+            TextView deviation_view = findViewById(R.id.result_stddev_textview);
+
 
             for (ArrayList<Float> pair : result){
                 time = pair.get(0);
                 voltage = pair.get(1);
                 //Log.i(TAG, "Recv'd: " + voltage + " " + time);
                 mSeries.appendData(new DataPoint(time, voltage), true, 30);
+
+                // Add to the mean
+                moving_stats.update(voltage);
+
+                // Update textviews with new stats
+                mean_view.setText(String.valueOf(moving_stats.mean()));
+                deviation_view.setText(String.valueOf(moving_stats.deviation()));
             }
             // Attempt to help the garbage collector; not sure if it matters
             result.clear();
@@ -296,10 +321,14 @@ public class graph_example extends AppCompatActivity {
             catch (IOException e)
             { msg("Error");}
         }
-        finish(); //return to the first layout
+        // Stop the processing thread / log to file
+        mRunning = false;
+        task.cancel(false);
 
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
-
 
     // fast way to call Toast
     private void msg(String s)

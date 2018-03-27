@@ -43,16 +43,13 @@
             android:label="Connect to a Device"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".ReceiveData"
-            android:label="Receiving Data Demo"
-            android:parentActivityName=".DeviceList" />
-        <activity
             android:name=".EditMode"
             android:screenOrientation="portrait"
             android:label="Edit Mode"
             android:parentActivityName=".CalibrationActivity" />
         <activity
-            android:name=".graph_example" />
+            android:name=".graph_example"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

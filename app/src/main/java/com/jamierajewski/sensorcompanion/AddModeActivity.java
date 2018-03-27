@@ -15,6 +15,7 @@ public class AddModeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_mode);
     }
 
+    // ***BEFORE ALLOWING USER TO SUBMIT, ATTEMPT TO PARSE IT AND TEST IT TO ENSURE IT IS VALID***
     public void submitMode(View view){
 
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
