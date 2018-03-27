@@ -5,8 +5,8 @@
     <string name="export_data">Export data</string>
     <string name="new_measurement">New Measurement</string>
     <string name="load_measurement">Load a measurement</string>
-    <string name="calibration_text">Please select a mode, or define a new one:</string>
-    <string name="add_mode">Add new mode</string>
+    <string name="calibration_text">Please select a function, or define a new one:</string>
+    <string name="add_mode">Add</string>
     <string name="next">Next</string>
-    <string name="edit_mode">Edit mode</string>
+    <string name="edit_mode">Edit</string>
 </resources>

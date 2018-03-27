@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void graphExample(View view){
-        Intent intent = new Intent(this, graph_example.class);
+        Intent intent = new Intent(this, GraphActivity.class);
         startActivity(intent);
     }
 }

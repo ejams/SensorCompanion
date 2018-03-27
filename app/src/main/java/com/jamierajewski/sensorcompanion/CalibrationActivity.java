@@ -94,7 +94,7 @@ public class CalibrationActivity extends AppCompatActivity {
         // Only take the expression after the '=' to evaluate
         formula_text = (formula_text.split("="))[1];
 
-        Intent intent = new Intent(this, DeviceList.class);
+        Intent intent = new Intent(this, DeviceListActivity.class);
         intent.putExtra(MODE, formula_text);
         startActivity(intent);
     }
@@ -115,7 +115,7 @@ public class CalibrationActivity extends AppCompatActivity {
         }
 
         else {
-            Intent intent = new Intent(this, EditMode.class);
+            Intent intent = new Intent(this, EditModeActivity.class);
             intent.putExtra("item", mode);
             startActivity(intent);
         }

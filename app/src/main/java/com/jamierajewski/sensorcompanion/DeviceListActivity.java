@@ -1,6 +1,5 @@
 package com.jamierajewski.sensorcompanion;
 
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -24,7 +23,7 @@ import java.util.Set;
 // https://stackoverflow.com/questions/18840896/constantly-update-list-items
 //
 
-public class DeviceList extends AppCompatActivity {
+public class DeviceListActivity extends AppCompatActivity {
 
     // Widgets
     Button btnPaired;
@@ -67,6 +66,7 @@ public class DeviceList extends AppCompatActivity {
             startActivityForResult(turnBTon,1);
         }
 
+
         btnPaired.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -107,7 +107,7 @@ public class DeviceList extends AppCompatActivity {
             String address = info.substring(info.length() - 17);
 
             // Make an intent to start next activity.
-            Intent i = new Intent(DeviceList.this, graph_example.class);
+            Intent i = new Intent(DeviceListActivity.this, GraphActivity.class);
 
             //Change the activity.
             i.putExtra(EXTRA_ADDRESS, address);

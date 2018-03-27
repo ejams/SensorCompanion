@@ -4,17 +4,13 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -27,20 +23,12 @@ import com.udojava.evalex.Expression;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimerTask;
 import java.util.UUID;
 
-import static java.lang.Float.parseFloat;
 
-
-public class graph_example extends AppCompatActivity {
+public class GraphActivity extends AppCompatActivity {
 
     private final Handler mHandler = new Handler();
     private LineGraphSeries<DataPoint> mSeries;
@@ -49,7 +37,7 @@ public class graph_example extends AppCompatActivity {
     Welford_Est moving_stats = new Welford_Est();
 
     // Tag for logging purposes
-    private static final String TAG = "graph_example";
+    private static final String TAG = "GraphActivity";
 
     // Tasks
     AsyncTask task;
@@ -71,14 +59,14 @@ public class graph_example extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_graph_example);
+        setContentView(R.layout.activity_graph);
 
         // BT
         Intent newint = getIntent();
         //receive the address of the bluetooth device
-        address = newint.getStringExtra(DeviceList.EXTRA_ADDRESS);
+        address = newint.getStringExtra(DeviceListActivity.EXTRA_ADDRESS);
         //receive the formula for converting
-        formula = newint.getStringExtra(DeviceList.FORMULA);
+        formula = newint.getStringExtra(DeviceListActivity.FORMULA);
 
         disconnect_btn = findViewById(R.id.disconnect_button);
 
@@ -135,7 +123,7 @@ public class graph_example extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         // Create an alert dialog to warn the user about deletion
-        AlertDialog alertDialog = new AlertDialog.Builder(graph_example.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(GraphActivity.this).create();
         alertDialog.setTitle("WARNING");
         alertDialog.setMessage("Are you sure you want to quit?");
         alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Yes",
@@ -343,7 +331,7 @@ public class graph_example extends AppCompatActivity {
         @Override
         protected void onPreExecute()
         {
-            progress = ProgressDialog.show(graph_example.this, "Connecting...", "Please wait!!!");  //show a progress dialog
+            progress = ProgressDialog.show(GraphActivity.this, "Connecting...", "Please wait!!!");  //show a progress dialog
         }
 
         @Override

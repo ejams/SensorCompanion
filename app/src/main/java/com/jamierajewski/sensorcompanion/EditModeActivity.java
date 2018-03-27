@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class EditMode extends AppCompatActivity {
+import com.udojava.evalex.Expression;
+
+public class EditModeActivity extends AppCompatActivity {
 
     String mode;
 
@@ -33,6 +35,19 @@ public class EditMode extends AppCompatActivity {
         formula.setText(formula_text);
     }
 
+    // Run a simple test on the user-added formula to ensure its validity
+    private boolean validFormula(String formula){
+        try{
+            formula = (formula.split("="))[1];
+            Expression expression = new Expression(formula).with("x", "2.41");
+            expression.eval();
+            return true;
+
+        } catch (Exception ex){
+            return false;
+        }
+    }
+
     public void submitEntry(View view){
 
         // Delete the old entry
@@ -53,6 +68,11 @@ public class EditMode extends AppCompatActivity {
             EditText formula = findViewById(R.id.editFormulaTextbox);
             String formula_text = formula.getText().toString();
 
+            if (!validFormula(formula_text)){
+                Toast.makeText(this, "Formula invalid, please validate your expression", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             // Insert into file and apply
             editor.putString(name_text, formula_text);
 
@@ -65,7 +85,7 @@ public class EditMode extends AppCompatActivity {
     public void deleteEntry(View view){
 
         // Create an alert dialog to warn the user about deletion
-        AlertDialog alertDialog = new AlertDialog.Builder(EditMode.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(EditModeActivity.this).create();
         alertDialog.setTitle("WARNING");
         alertDialog.setMessage("Are you sure you want to delete this entry?");
         alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Yes",
@@ -75,7 +95,7 @@ public class EditMode extends AppCompatActivity {
                         // DELETE THE ENTRY
                         SharedPreferences.Editor editor = getSharedPreferences("modeFile", MODE_PRIVATE).edit();
                         if (mode.matches("Voltage")){
-                            Toast.makeText(EditMode.this, "Cannot remove Voltage default", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditModeActivity.this, "Cannot remove Voltage default", Toast.LENGTH_SHORT).show();
                         }
 
                         else {

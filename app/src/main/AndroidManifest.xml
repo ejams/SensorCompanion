@@ -35,20 +35,20 @@
         <activity
             android:name=".AddModeActivity"
             android:screenOrientation="portrait"
-            android:label="Add New Mode"
+            android:label="Add New Function"
             android:parentActivityName=".CalibrationActivity" />
         <activity
-            android:name=".DeviceList"
+            android:name=".DeviceListActivity"
             android:screenOrientation="portrait"
             android:label="Connect to a Device"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".EditMode"
+            android:name=".EditModeActivity"
             android:screenOrientation="portrait"
-            android:label="Edit Mode"
+            android:label="Edit Function"
             android:parentActivityName=".CalibrationActivity" />
         <activity
-            android:name=".graph_example"
+            android:name=".GraphActivity"
             android:parentActivityName=".MainActivity"/>
     </application>
 
