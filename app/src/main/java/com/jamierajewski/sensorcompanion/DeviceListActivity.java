@@ -35,7 +35,9 @@ public class DeviceListActivity extends AppCompatActivity {
     private Set<BluetoothDevice> pairedDevices;
     public static String EXTRA_ADDRESS = "device_address";
     public static String FORMULA = "formula";
-    public String mode;
+    public static String FUNCTION = "function";
+    public String formula_text;
+    public String formula_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,8 @@ public class DeviceListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_device_list);
 
         Intent newintent = getIntent();
-        mode = newintent.getStringExtra(CalibrationActivity.MODE);
+        formula_text = newintent.getStringExtra(CalibrationActivity.MODE);
+        formula_name = newintent.getStringExtra(CalibrationActivity.FUNCTION);
 
         //Calling widgets
         btnPaired = findViewById(R.id.paired_button);
@@ -119,7 +122,8 @@ public class DeviceListActivity extends AppCompatActivity {
 
             //Change the activity.
             i.putExtra(EXTRA_ADDRESS, address);
-            i.putExtra(FORMULA, mode);
+            i.putExtra(FORMULA, formula_text);
+            i.putExtra(FUNCTION, formula_name);
             startActivity(i);
         }
     };

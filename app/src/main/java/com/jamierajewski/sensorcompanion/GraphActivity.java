@@ -37,7 +37,6 @@ import java.util.UUID;
 
 
 // ***TODO*** //
-// - Pass in function name so that y-axis and file header can have appropriate name (not just Voltage)
 // - Refactor this ugly behemoth
 // - Find solution to self-scaling y-axis based on given formula
 
@@ -59,7 +58,8 @@ public class GraphActivity extends AppCompatActivity {
     AsyncTask task;
 
     // Formula
-    String formula = null;
+    String formula_text;
+    String formula_name;
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
@@ -86,10 +86,12 @@ public class GraphActivity extends AppCompatActivity {
         //receive the address of the bluetooth device
         address = newint.getStringExtra(DeviceListActivity.EXTRA_ADDRESS);
         //receive the formula for converting
-        formula = newint.getStringExtra(DeviceListActivity.FORMULA);
+        formula_text = newint.getStringExtra(DeviceListActivity.FORMULA);
+        // receive the formula name for inserting as the y-axis and for logging
+        formula_name = newint.getStringExtra(DeviceListActivity.FUNCTION);
 
         //**CHANGE THIS TO RECEIVE Y-AXIS NAME AND INSERT THAT AS A HEADER**//
-        String[] headers = {"Voltage", "Time", "Mean", "Std. Deviation"};
+        String[] headers = {formula_name, "Time", "Mean", "Std. Deviation"};
 
         finish_button = findViewById(R.id.finish_button);
 
@@ -151,7 +153,7 @@ public class GraphActivity extends AppCompatActivity {
 
         // **RATHER THAN USE GRAPHVIEW LABELS, CREATE MY OWN SINCE THEY'RE STATIC**
         //graph.getGridLabelRenderer().setPadding(75);
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Voltage (V)");
+        graph.getGridLabelRenderer().setVerticalAxisTitle(formula_name);
         graph.getGridLabelRenderer().setLabelVerticalWidth(50);
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time (s)");
         graph.getGridLabelRenderer().setLabelHorizontalHeight(50);
@@ -301,7 +303,7 @@ public class GraphActivity extends AppCompatActivity {
                     String[] parts = entry.split("-");
 
                     //voltage = Float.parseFloat(parts[0]);
-                    Expression expression = new Expression(formula).with("x", parts[0]);
+                    Expression expression = new Expression(formula_text).with("x", parts[0]);
                     temp = expression.eval();
                     voltage = temp.floatValue();
 

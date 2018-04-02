@@ -29,10 +29,6 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".TEST_CSV"
-            android:label="Establish Connection"
-            android:parentActivityName=".CalibrationActivity" />
-        <activity
             android:name=".AddModeActivity"
             android:screenOrientation="portrait"
             android:label="Add New Function"

@@ -18,6 +18,7 @@ import java.util.Map;
 public class CalibrationActivity extends AppCompatActivity {
 
     public static String MODE = "formula";
+    public static String FUNCTION = "function";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +97,7 @@ public class CalibrationActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, DeviceListActivity.class);
         intent.putExtra(MODE, formula_text);
+        intent.putExtra(FUNCTION, mode);
         startActivity(intent);
     }
 

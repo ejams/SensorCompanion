@@ -19,9 +19,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CalibrationActivity.class);
         startActivity(intent);
     }
-
-    public void CSVtest(View view){
-        Intent intent = new Intent(this, TEST_CSV.class);
-        startActivity(intent);
-    }
 }
