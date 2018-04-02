@@ -20,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void graphExample(View view){
-        Intent intent = new Intent(this, GraphActivity.class);
+    public void CSVtest(View view){
+        Intent intent = new Intent(this, TEST_CSV.class);
         startActivity(intent);
     }
 }

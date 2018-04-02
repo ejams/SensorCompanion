@@ -21,19 +21,33 @@ import android.widget.Toast;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.opencsv.CSVWriter;
 import com.udojava.evalex.Expression;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
+
+
+// ***TODO*** //
+// - Pass in function name so that y-axis and file header can have appropriate name (not just Voltage)
+// - Refactor this ugly behemoth
+// - Find solution to self-scaling y-axis based on given formula
 
 public class GraphActivity extends AppCompatActivity {
 
     private final Handler mHandler = new Handler();
     private LineGraphSeries<DataPoint> mSeries;
+
+    // Exported CSV file
+    private String FILENAME;
 
     // Stat-related
     Welford_Est moving_stats = new Welford_Est();
@@ -63,12 +77,19 @@ public class GraphActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        // Create a unique filename by getting a timestamp in simple format down to
+        // the second
+        FILENAME = new SimpleDateFormat("yyyyMMddHHmmss'.csv'").format(new Date());
+
         // BT
         Intent newint = getIntent();
         //receive the address of the bluetooth device
         address = newint.getStringExtra(DeviceListActivity.EXTRA_ADDRESS);
         //receive the formula for converting
         formula = newint.getStringExtra(DeviceListActivity.FORMULA);
+
+        //**CHANGE THIS TO RECEIVE Y-AXIS NAME AND INSERT THAT AS A HEADER**//
+        String[] headers = {"Voltage", "Time", "Mean", "Std. Deviation"};
 
         finish_button = findViewById(R.id.finish_button);
 
@@ -85,11 +106,34 @@ public class GraphActivity extends AppCompatActivity {
             }
         });
 
+        // Write the headers of the CSV
+        writeHeaders(headers);
+
         // Graph
         GraphView graph = findViewById(R.id.graph);
-
         initGraph(graph);
     }
+
+    // File is located in Android/sensorcompanion/Measurements/
+    public void writeHeaders(String[] headers){
+        // Create file if it doesn't exist, and fill in headers
+        File file = new File(getExternalFilesDir(null),"Measurements");
+        if(!file.exists()){
+            file.mkdir();
+        }
+
+        File data = new File(file, FILENAME);
+        try{
+            CSVWriter writer = new CSVWriter(new FileWriter(data, true));
+            // Write column names
+            writer.writeNext(headers, false);
+            writer.close();
+        } catch (Exception ex){
+            Toast.makeText(this, "ERROR - CANNOT CREATE CSV WRITER", Toast.LENGTH_SHORT).show();
+            ex.printStackTrace();
+        }
+    }
+
 
     public void initGraph(GraphView graph) {
         // ***ALLOW USER TO SPECIFY THEIR OWN RANGE?*** <<--- YES
@@ -145,44 +189,6 @@ public class GraphActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-//    public void onStartPressed(View view){
-//
-//        // Create an alert dialog to get the range for the graph
-//        AlertDialog alertDialog = new AlertDialog.Builder(GraphActivity.this).create();
-//        alertDialog.setTitle("Range");
-//        alertDialog.setMessage("Please set the range: ");
-//
-//        final EditText input = new EditText(this);
-//        input.setInputType(InputType.TYPE_CLASS_TEXT);
-//        alertDialog.setView(input);
-//        alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Enter",
-//                new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        int lower, higher = 0;
-//                        try {
-//                            String[] result = (input.getText().toString()).split(",");
-//                            lower = Integer.getInteger(result[0]);
-//                            higher = Integer.getInteger(result[1]);
-//                        } catch (Exception ex){
-//                            return;
-//                        }
-//                        GraphView graph = findViewById(R.id.graph);
-//                        graph.getViewport().setMinY(lower);
-//                        graph.getViewport().setMaxY(higher);
-//                        graph.draw();
-//                    }
-//
-//                });
-//        alertDialog.setButton(alertDialog.BUTTON_NEGATIVE, "Cancel",
-//                new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        alertDialog.dismiss();
-//                    }
-//                });
-//        alertDialog.show();
-//    }
-
 
     // CITATION - http://alias-i.com/lingpipe/docs/api/com/aliasi/stats/OnlineNormalEstimator.html
     // Modified for float instead of double; add std. dev
@@ -201,6 +207,37 @@ public class GraphActivity extends AppCompatActivity {
         float mean() { return mu; }
         float var() { return n > 1 ? sq/n : 0; }
         float deviation() {return (float)Math.sqrt(var());}
+    }
+
+    public void writeDataCSV(String[] toWrite){
+
+        // The file should have already been created prior, but still check if it exists to make sure
+        try{
+            File file = new File(getExternalFilesDir(null),"Measurements");
+            if(!file.exists()){
+                file.mkdir();
+            }
+
+            // Create CSV writer
+            File data = new File(file, FILENAME);
+            CSVWriter writer = new CSVWriter(new FileWriter(data, true));
+
+            for (String entry : toWrite){
+                if (entry == null){
+                    break;
+                }
+                String[] temp = entry.split("-");
+                writer.writeNext(temp, false);
+            }
+
+            writer.close();
+
+
+        } catch (Exception ex){
+            Toast.makeText(this, "Error creating or reading file", Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
+
     }
 
 
@@ -299,13 +336,15 @@ public class GraphActivity extends AppCompatActivity {
         {
             float time;
             float voltage;
+            int count = 0;
             TextView mean_view = findViewById(R.id.result_mean_textview);
             TextView deviation_view = findViewById(R.id.result_stddev_textview);
-
+            String[] toWrite = new String[37];
 
             for (ArrayList<Float> pair : result){
                 time = pair.get(0);
                 voltage = pair.get(1);
+
                 //Log.i(TAG, "Recv'd: " + voltage + " " + time);
                 mSeries.appendData(new DataPoint(time, voltage), true, 30);
 
@@ -315,9 +354,16 @@ public class GraphActivity extends AppCompatActivity {
                 // Update textviews with new stats
                 mean_view.setText(String.valueOf(moving_stats.mean()));
                 deviation_view.setText(String.valueOf(moving_stats.deviation()));
+                // Re-combine the verified data back to a string to be written to the file
+                String temp = Float.toString(voltage) + "-" + Float.toString(time) + "-" + moving_stats.mean() + "-" + moving_stats.deviation();
+                toWrite[count] = temp;
+                count++;
             }
             // Attempt to help the garbage collector; not sure if it matters
             result.clear();
+
+            // Finally, pass the string array to the write function to write this data set to the file
+            writeDataCSV(toWrite);
         }
     }
 

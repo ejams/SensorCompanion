@@ -42,9 +42,13 @@ public class TEST_CSV extends AppCompatActivity {
                 file.mkdir();
             }
 
-            //
+            // Create CSV writer
             File data = new File(file, FILENAME);
             CSVWriter writer = new CSVWriter(new FileWriter(data, true));
+
+            String[] headers = {"Voltage (V)", "Time (s)"};
+            // Write column names
+            writer.writeNext(headers, false);
 
             // Get the data from the field when the button is pressed; split it by comma
             TextView textView = findViewById(R.id.csvTextbox);
