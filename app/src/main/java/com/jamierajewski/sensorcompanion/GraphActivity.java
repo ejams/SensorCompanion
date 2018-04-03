@@ -60,6 +60,7 @@ public class GraphActivity extends AppCompatActivity {
     // Formula
     String formula_text;
     String formula_name;
+    float min, max;
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
@@ -89,6 +90,9 @@ public class GraphActivity extends AppCompatActivity {
         formula_text = newint.getStringExtra(DeviceListActivity.FORMULA);
         // receive the formula name for inserting as the y-axis and for logging
         formula_name = newint.getStringExtra(DeviceListActivity.FUNCTION);
+        // receive the min and max for the y-axis
+        min = newint.getFloatExtra(CalibrationActivity.MIN, 0.0f);
+        max = newint.getFloatExtra(CalibrationActivity.MAX, 0.0f);
 
         //**CHANGE THIS TO RECEIVE Y-AXIS NAME AND INSERT THAT AS A HEADER**//
         String[] headers = {formula_name, "Time", "Mean", "Std. Deviation"};
@@ -113,7 +117,7 @@ public class GraphActivity extends AppCompatActivity {
 
         // Graph
         GraphView graph = findViewById(R.id.graph);
-        initGraph(graph);
+        initGraph(graph, min, max);
     }
 
     // File is located in Android/sensorcompanion/Measurements/
@@ -137,11 +141,11 @@ public class GraphActivity extends AppCompatActivity {
     }
 
 
-    public void initGraph(GraphView graph) {
+    public void initGraph(GraphView graph, float min, float max) {
         // ***ALLOW USER TO SPECIFY THEIR OWN RANGE?*** <<--- YES
-//        graph.getViewport().setYAxisBoundsManual(true);
-//        graph.getViewport().setMinY(0);
-//        graph.getViewport().setMaxY(5);
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(min);
+        graph.getViewport().setMaxY(max);
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
@@ -316,7 +320,7 @@ public class GraphActivity extends AppCompatActivity {
                 // Ensure data is valid, then store in a float pair
                 //***RATHER THAN 0-5, CHECK IF IT'S BETWEEN THE RANGE SET BY THE USER***
                 //if (voltage > 0.00 && voltage <= 5.00 && time > lastTime) {
-                if (time > lastTime) {
+                if (time > lastTime && voltage >= min && voltage <= max) {
                     lastTime = time;
                     ArrayList<Float> pair = new ArrayList<>();
                     pair.add(time);

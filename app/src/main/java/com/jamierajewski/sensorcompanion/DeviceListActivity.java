@@ -17,6 +17,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Set;
 
+import static com.jamierajewski.sensorcompanion.CalibrationActivity.MAX;
+import static com.jamierajewski.sensorcompanion.CalibrationActivity.MIN;
+
 //
 // Bluetooth based on code from:
 // http://www.instructables.com/id/Android-Bluetooth-Control-LED-Part-2/
@@ -38,6 +41,7 @@ public class DeviceListActivity extends AppCompatActivity {
     public static String FUNCTION = "function";
     public String formula_text;
     public String formula_name;
+    public float min, max;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,8 @@ public class DeviceListActivity extends AppCompatActivity {
         Intent newintent = getIntent();
         formula_text = newintent.getStringExtra(CalibrationActivity.MODE);
         formula_name = newintent.getStringExtra(CalibrationActivity.FUNCTION);
+        min = newintent.getFloatExtra(CalibrationActivity.MIN, 0.0f);
+        max = newintent.getFloatExtra(CalibrationActivity.MAX, 0.0f);
 
         //Calling widgets
         btnPaired = findViewById(R.id.paired_button);
@@ -124,6 +130,8 @@ public class DeviceListActivity extends AppCompatActivity {
             i.putExtra(EXTRA_ADDRESS, address);
             i.putExtra(FORMULA, formula_text);
             i.putExtra(FUNCTION, formula_name);
+            i.putExtra(MIN, min);
+            i.putExtra(MAX, max);
             startActivity(i);
         }
     };

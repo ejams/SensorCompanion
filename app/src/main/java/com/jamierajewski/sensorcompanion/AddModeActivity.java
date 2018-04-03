@@ -9,7 +9,8 @@ import android.widget.Toast;
 
 import com.udojava.evalex.Expression;
 
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AddModeActivity extends AppCompatActivity {
 
@@ -38,14 +39,15 @@ public class AddModeActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
 
         // Fetch both fields
-        EditText name_text = findViewById(R.id.editNameTextbox);
+        EditText name_text = findViewById(R.id.addNameTextbox);
         String name = name_text.getText().toString().trim();
+
         if (prefs.contains(name)){
             Toast.makeText(this, "That name already exists, please choose another", Toast.LENGTH_LONG).show();
         }
 
         else {
-            EditText formula_text = findViewById(R.id.editFormulaTextbox);
+            EditText formula_text = findViewById(R.id.addFormulaTextbox);
             String formula = formula_text.getText().toString().trim();
 
             // Verify that both textboxes are not empty, otherwise cancel the submission
@@ -62,7 +64,16 @@ public class AddModeActivity extends AppCompatActivity {
                 // Now that we have the items, store them in the shared preferences file
                 SharedPreferences.Editor editor = getSharedPreferences("modeFile", MODE_PRIVATE).edit();
 
+                EditText min = findViewById(R.id.addMinTextbox);
+                String minText = min.getText().toString();
+                EditText max = findViewById(R.id.addMaxTextbox);
+                String maxText = max.getText().toString();
+
                 editor.putString(name, formula);
+                // Absolutely filthy and probably not the best way to do it (could've stored as one string separated by
+                // delimiter and then split/cast later?) but itll probably work
+                editor.putFloat(name+"_", Float.parseFloat(minText));
+                editor.putFloat(name+"__", Float.parseFloat(maxText));
                 editor.apply();
                 finish();
             }

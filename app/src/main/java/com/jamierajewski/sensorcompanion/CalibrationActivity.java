@@ -13,12 +13,16 @@ import com.udojava.evalex.Expression;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class CalibrationActivity extends AppCompatActivity {
 
     public static String MODE = "formula";
     public static String FUNCTION = "function";
+    public static String MIN = "min";
+    public static String MAX = "max";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +45,20 @@ public class CalibrationActivity extends AppCompatActivity {
         // Check if voltage exists; if not, add it in as a default
         if (!prefs.contains("Voltage")){
             SharedPreferences.Editor editor = getSharedPreferences("modeFile", MODE_PRIVATE).edit();
+
             editor.putString("Voltage", "y=x");
+            editor.putFloat("Voltage_", 0.0f);
+            editor.putFloat("Voltage__", 5.0f);
             editor.apply();
         }
         // Get all entries so that we can pull just the keys out to populate the spinner
         ArrayList<String> tempList = new ArrayList<>();
         Map<String, ?> allEntries = prefs.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()){
-            tempList.add(entry.getKey());
+            // Filter out the entries that are for min/max
+            if (!entry.getKey().endsWith("_")){
+                tempList.add(entry.getKey());
+            }
         }
 
         // Once all keys are pulled, convert the temporary array list to an array to be used
@@ -67,24 +77,6 @@ public class CalibrationActivity extends AppCompatActivity {
         spinner.setSelection(0,true);
     }
 
-    public void testMode(View view){
-        Spinner spinner = findViewById(R.id.modeSpinner);
-        String mode = spinner.getSelectedItem().toString();
-
-        // Get the associated formula with the selection
-        SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
-        String formula_text = prefs.getString(mode, null);
-
-        BigDecimal result;
-
-        formula_text = (formula_text.split("="))[1];
-        Expression expression = new Expression(formula_text).with("x", "2.41");
-        result = expression.eval();
-        Float f = result.floatValue();
-
-        Toast.makeText(this, "Result: " + f, Toast.LENGTH_LONG).show();
-    }
-
     public void connect(View view){
         Spinner spinner = findViewById(R.id.modeSpinner);
         String mode = spinner.getSelectedItem().toString();
@@ -92,12 +84,17 @@ public class CalibrationActivity extends AppCompatActivity {
         // Get the associated formula with the selection
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
         String formula_text = prefs.getString(mode, null);
+        float min = prefs.getFloat(mode+"_", 0.0f);
+        float max = prefs.getFloat(mode+"__", 0.0f);
+
         // Only take the expression after the '=' to evaluate
         formula_text = (formula_text.split("="))[1];
 
         Intent intent = new Intent(this, DeviceListActivity.class);
         intent.putExtra(MODE, formula_text);
         intent.putExtra(FUNCTION, mode);
+        intent.putExtra(MIN, min);
+        intent.putExtra(MAX, max);
         startActivity(intent);
     }
 

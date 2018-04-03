@@ -25,14 +25,22 @@ public class EditModeActivity extends AppCompatActivity {
         mode = bundle.getString("item");
 
         // Set the textbox for name to the passed in name
-        EditText name = findViewById(R.id.editNameTextbox);
+        EditText name = findViewById(R.id.addNameTextbox);
         name.setText(mode);
 
-        // To get the associated formula, we have to pull it from sharedpreferences
-        EditText formula = findViewById(R.id.editFormulaTextbox);
+        // To get the associated formula and range, we have to pull it from sharedpreferences
+        EditText formula = findViewById(R.id.addFormulaTextbox);
+        EditText min = findViewById(R.id.addMinTextbox);
+        EditText max = findViewById(R.id.addMaxTextbox);
+
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
+
         String formula_text = prefs.getString(mode, null);
+        String min_text = String.valueOf(prefs.getFloat(mode+"_", 0.0f));
+        String max_text = String.valueOf(prefs.getFloat(mode+"__", 0.0f));
         formula.setText(formula_text);
+        min.setText(min_text);
+        max.setText(max_text);
     }
 
     // Run a simple test on the user-added formula to ensure its validity
@@ -55,7 +63,7 @@ public class EditModeActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
 
         // Pull the new info
-        EditText name = findViewById(R.id.editNameTextbox);
+        EditText name = findViewById(R.id.addNameTextbox);
         String name_text = name.getText().toString();
 
         // Check if the name exists AND that the name being replaced is not that one
@@ -65,16 +73,28 @@ public class EditModeActivity extends AppCompatActivity {
 
         else{
             editor.remove(mode);
-            EditText formula = findViewById(R.id.editFormulaTextbox);
+            EditText formula = findViewById(R.id.addFormulaTextbox);
             String formula_text = formula.getText().toString();
+
+            EditText min = findViewById(R.id.addMinTextbox);
+            EditText max = findViewById(R.id.addMaxTextbox);
+            String min_text = min.getText().toString();
+            String max_text = max.getText().toString();
 
             if (!validFormula(formula_text)){
                 Toast.makeText(this, "Formula invalid, please validate your expression", Toast.LENGTH_LONG).show();
                 return;
             }
 
+            if (min_text.matches("") || max_text.matches("")){
+                Toast.makeText(this, "Please fill in the min and max", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             // Insert into file and apply
             editor.putString(name_text, formula_text);
+            editor.putFloat(name_text+"_", Float.parseFloat(min_text));
+            editor.putFloat(name_text+"__", Float.parseFloat(max_text));
 
             editor.apply();
 
