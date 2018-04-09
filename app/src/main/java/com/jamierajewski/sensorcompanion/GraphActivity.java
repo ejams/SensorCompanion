@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,6 +55,7 @@ public class GraphActivity extends AppCompatActivity {
 
     // Tag for logging purposes
     private static final String TAG = "GraphActivity";
+    private int tagCount = 0;
 
     // Tasks
     AsyncTask task;
@@ -155,7 +158,7 @@ public class GraphActivity extends AppCompatActivity {
 
         // Pad the y-axis labels so they are visible
 
-        // **RATHER THAN USE GRAPHVIEW LABELS, CREATE MY OWN SINCE THEY'RE STATIC**
+        // **RATHER THAN USE GRAPHVIEW LABELS, CREATE MY OWN SINCE THEY'RE STATIC?**
         //graph.getGridLabelRenderer().setPadding(75);
         graph.getGridLabelRenderer().setVerticalAxisTitle(formula_name);
         graph.getGridLabelRenderer().setLabelVerticalWidth(50);
@@ -264,8 +267,6 @@ public class GraphActivity extends AppCompatActivity {
         }
     };
 
-    /// CREATE ANOTHER ASYNCTASK TO WRITE TO FILE??? /// <<--- YES, CALL IT INSIDE processData
-
     // **SPLIT THIS INTO SMALLER FUNCTIONS THAT GET CALLED INSIDE THE ASYNCTASK**
     private class processData extends AsyncTask<BluetoothSocket, ArrayList, ArrayList<ArrayList>>
     {
@@ -280,6 +281,7 @@ public class GraphActivity extends AppCompatActivity {
             float voltage;
             float time;
             String[] ret;
+            String str;
 
             try {
                 InputStream socketInputStream = sockets[0].getInputStream();
@@ -290,8 +292,8 @@ public class GraphActivity extends AppCompatActivity {
                         break;
                     }
                 }
-                String str = new String(data, 0, offset, "UTF-8");
-                ret = str.split("\n");
+                str = new String(data, 0, offset, "UTF-8");
+                str = str.replace("\n", "");
 
             } catch (IOException e){
                 // If the socket cant be opened, return null
@@ -299,41 +301,60 @@ public class GraphActivity extends AppCompatActivity {
                 return null;
             }
 
+            //***ONLY SPLIT AFTER VERIFYING INPUT***//
+            ret = verifyData(str);
+
             float lastTime = 0;
             ArrayList<ArrayList> pairList = new ArrayList<>();
 
             for (String entry: ret) {
-                try {
-                    String[] parts = entry.split("-");
+                // Exclude garbage entries
+                if (!entry.equals("")){
+                    try {
+                        String[] parts = entry.split("-");
+                        Expression expression = new Expression(formula_text).with("x", parts[0]);
+                        temp = expression.eval();
+                        voltage = temp.floatValue();
 
-                    //voltage = Float.parseFloat(parts[0]);
-                    Expression expression = new Expression(formula_text).with("x", parts[0]);
-                    temp = expression.eval();
-                    voltage = temp.floatValue();
+                        time = Float.parseFloat(parts[1]);
 
-                    time = Float.parseFloat(parts[1]);
+                    } catch (Exception e) {
+                        continue;
+                    }
 
-                } catch (Exception e) {
-                    continue;
-                }
+                    // Ensure data is valid, then store in a float pair
+                    //***RATHER THAN 0-5, CHECK IF IT'S BETWEEN THE RANGE SET BY THE USER <- NO***
+                    //if (voltage > 0.00 && voltage <= 5.00 && time > lastTime) {
+                    if (time > lastTime) {
+                        lastTime = time;
+                        ArrayList<Float> pair = new ArrayList<>();
+                        pair.add(time);
+                        pair.add(voltage);
 
-                // Ensure data is valid, then store in a float pair
-                //***RATHER THAN 0-5, CHECK IF IT'S BETWEEN THE RANGE SET BY THE USER***
-                //if (voltage > 0.00 && voltage <= 5.00 && time > lastTime) {
-                if (time > lastTime && voltage >= min && voltage <= max) {
-                    lastTime = time;
-                    ArrayList<Float> pair = new ArrayList<>();
-                    pair.add(time);
-                    pair.add(voltage);
-
-                    // Now store that pair in the list to be returned
-                    pairList.add(pair);
-                } else {
-                    continue;
+                        // Now store that pair in the list to be returned
+                        pairList.add(pair);
+                    } else {
+                        continue;
+                    }
                 }
             }
-
             return pairList;
+        }
+
+        // Helper function to ensure only complete data is received, and remove anything else
+        private String[] verifyData(String data){
+
+            if (!data.endsWith("&")){
+                data = data.substring(0, data.lastIndexOf("&"));
+            }
+
+            if (!data.startsWith("&")){
+                data = data.substring(data.indexOf("&"));
+            }
+
+            String[] res = data.split("&");
+
+            return res;
         }
 
         // After processing, append each new point to the graph
@@ -351,7 +372,7 @@ public class GraphActivity extends AppCompatActivity {
                 time = pair.get(0);
                 voltage = pair.get(1);
 
-                //Log.i(TAG, "Recv'd: " + voltage + " " + time);
+                Log.i(TAG, "Recv'd: " + voltage + " " + time);
                 mSeries.appendData(new DataPoint(time, voltage), true, 30);
 
                 // Add to the mean

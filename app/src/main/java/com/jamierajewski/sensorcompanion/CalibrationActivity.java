@@ -42,6 +42,7 @@ public class CalibrationActivity extends AppCompatActivity {
     public void populateSpinner(){
         // Create and/or open file containing different modes
         SharedPreferences prefs = getSharedPreferences("modeFile", MODE_PRIVATE);
+
         // Check if voltage exists; if not, add it in as a default
         if (!prefs.contains("Voltage")){
             SharedPreferences.Editor editor = getSharedPreferences("modeFile", MODE_PRIVATE).edit();
