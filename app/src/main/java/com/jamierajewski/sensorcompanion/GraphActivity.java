@@ -66,7 +66,7 @@ public class GraphActivity extends AppCompatActivity {
 
     // BLUETOOTH-RELATED
     private boolean mRunning;
-    Button finish_button;
+    Button stopButton;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -98,12 +98,12 @@ public class GraphActivity extends AppCompatActivity {
 
         String[] headers = {formula_name, "Time", "Mean", "Std. Deviation"};
 
-        finish_button = findViewById(R.id.finish_button);
+        stopButton = findViewById(R.id.stopButton);
 
         new ConnectBT().execute(); //Call the class to connect
 
         //commands to be sent to bluetooth
-        finish_button.setOnClickListener(new View.OnClickListener()
+        stopButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
