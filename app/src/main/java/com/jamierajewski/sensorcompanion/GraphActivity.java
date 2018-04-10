@@ -54,8 +54,7 @@ public class GraphActivity extends AppCompatActivity {
     Welford_Est moving_stats = new Welford_Est();
 
     // Tag for logging purposes
-    private static final String TAG = "GraphActivity";
-    private int tagCount = 0;
+    //private static final String TAG = "GraphActivity";
 
     // Tasks
     AsyncTask task;
@@ -97,7 +96,6 @@ public class GraphActivity extends AppCompatActivity {
         min = newint.getFloatExtra(CalibrationActivity.MIN, 0.0f);
         max = newint.getFloatExtra(CalibrationActivity.MAX, 0.0f);
 
-        //**CHANGE THIS TO RECEIVE Y-AXIS NAME AND INSERT THAT AS A HEADER**//
         String[] headers = {formula_name, "Time", "Mean", "Std. Deviation"};
 
         finish_button = findViewById(R.id.finish_button);
@@ -372,7 +370,7 @@ public class GraphActivity extends AppCompatActivity {
                 time = pair.get(0);
                 voltage = pair.get(1);
 
-                Log.i(TAG, "Recv'd: " + voltage + " " + time);
+                //Log.i(TAG, "Recv'd: " + voltage + " " + time);
                 mSeries.appendData(new DataPoint(time, voltage), true, 30);
 
                 // Add to the mean

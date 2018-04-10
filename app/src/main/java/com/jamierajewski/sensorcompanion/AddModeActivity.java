@@ -1,5 +1,6 @@
 package com.jamierajewski.sensorcompanion;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,6 +32,11 @@ public class AddModeActivity extends AppCompatActivity {
         } catch (Exception ex){
             return false;
         }
+    }
+
+    public void helpMenu(View view){
+        Intent i = new Intent(AddModeActivity.this, HelpActivity.class);
+        startActivity(i);
     }
 
     // ***BEFORE ALLOWING USER TO SUBMIT, ATTEMPT TO PARSE IT AND TEST IT TO ENSURE IT IS VALID***

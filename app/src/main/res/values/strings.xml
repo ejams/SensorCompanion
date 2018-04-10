@@ -9,4 +9,27 @@
     <string name="add_mode">Add</string>
     <string name="next">Next</string>
     <string name="edit_mode">Edit</string>
+
+    <string name="help_text">
+ <![CDATA[
+ <p>
+ <b>Name</b> - Provide a name for your function. The built-in example is Voltage.
+ </p>
+ <p>
+ <b>Formula</b> - Provide the conversion function from voltage back into your unit.
+ This is presented in the format y=x, where x is the received voltage and y is the
+ converted unit. Many mathematical functions and operations are available; full documentation
+ can be found at <a href="https://github.com/uklimaschewski/EvalEx">the official page</a>. The
+ variables y and x <b><i>MUST</b></i> be used.
+ </p>
+<p>
+<b>Min and Max</b> - These are the limits for the y-axis that the graph will display. If this is
+your first time running a certain function and you do not know how far the data will extend, you can
+experiment with these values by trying some, and using the Edit function from the Calibration screen
+to adjust them as needed.
+</p>
+ <p><b>Hit back button to return.</b>
+ </p>
+ ]]>
+ </string>
 </resources>
