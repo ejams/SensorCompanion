@@ -182,7 +182,8 @@ public class GraphActivity extends AppCompatActivity {
         alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Disconnect();
+                        saveAlert();
+                        alertDialog.dismiss();
                     }
 
                 });
@@ -192,6 +193,52 @@ public class GraphActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         alertDialog.dismiss();
                     }
+                });
+        alertDialog.show();
+    }
+
+    public void saveAlert(){
+        // Create an alert dialog to warn the user about deletion
+        AlertDialog alertDialog = new AlertDialog.Builder(GraphActivity.this).create();
+        alertDialog.setTitle("Save Data");
+        alertDialog.setMessage("Would you like to save this measurement?");
+        alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        saveConfirmed();
+                        alertDialog.dismiss();
+                    }
+
+                });
+        alertDialog.setButton(alertDialog.BUTTON_NEGATIVE, "No",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // DELETE FILE HERE
+                        try{
+                            File dir = new File(getExternalFilesDir(null),"Measurements");
+                            File file = new File(dir, FILENAME);
+                            file.delete();
+                        } finally {
+                            Disconnect();
+                        }
+                        alertDialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
+    public void saveConfirmed(){
+        // Create an alert dialog to warn the user about deletion
+        AlertDialog alertDialog = new AlertDialog.Builder(GraphActivity.this).create();
+        alertDialog.setTitle("Save Data");
+        alertDialog.setMessage("Data saved in CSV format at /Android/data/com.jamierajewski.sensorCompanion/files");
+        alertDialog.setButton(alertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Disconnect();
+                    }
+
                 });
         alertDialog.show();
     }
