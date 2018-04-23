@@ -26,16 +26,30 @@
         <activity
             android:name=".CalibrationActivity"
             android:label="Calibration"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".TEST_CSV"
-            android:label="Establish Connection"
-            android:parentActivityName=".CalibrationActivity" />
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".AddModeActivity"
-            android:label="Add New Mode"
-            android:parentActivityName=".CalibrationActivity" />
-        <activity android:name=".EditModeActivity"></activity>
+            android:label="Add New Function"
+            android:parentActivityName=".CalibrationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DeviceListActivity"
+            android:label="Connect to a Device"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".EditModeActivity"
+            android:label="Edit Function"
+            android:parentActivityName=".CalibrationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GraphActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".HelpActivity"
+            android:parentActivityName=".AddModeActivity"
+            android:label="Help">
+        </activity>
     </application>
 
 </manifest>
